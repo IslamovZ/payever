@@ -1,22 +1,12 @@
 var express = require('express');
-var request = require('request');
-var rp = require('request-promise');
 var fs = require('fs');
+
+var usersController = require('./controllers/users');
 
 
 var app = express();
 
-app.get('/api/user/:id', function (req, res) {
-	var id = req.params.id;
-	rp.get('https://reqres.in/api/users/'+id)
-		.then(function(data) {
-			res.status(200).send(data);
-		})
-		.catch(function(err){
-			logErr(err);
-			return res.status(400).send(err);
-		});
-});
+app.get('/api/user/:id', usersController.getById);
 
 app.get('/api/user/:id/avatar', function(req, res){
 	var id = req.params.id;
