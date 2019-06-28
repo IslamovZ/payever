@@ -1,33 +1,31 @@
-const sourceLink = require('../config').sourceLink;
 const rp = require('request-promise');
-const fs = require('fs');
-const { promisify } = require('util');
-
-const writeFile = promisify(fs.writeFile);
-const readFile = promisify(fs.readFile);
-const existsFile = promisify(fs.exists);
-
+const utils = require('./utils')
 
 class Avatar{
 	checkExist(userId){
 		let path = this._getAvatarsPath(userId);
-		return existsFile(path);
+		return utils.existsFile(path);
 	}
 
-	downloadFromRest(userId, link){
+	downloadFromHost(userId, link){
 		let path = this._getAvatarsPath(userId);
-		return rp({uri:link}).then(res => writeFile(path, res));
+		return rp({uri:link}).then(res => utils.writeFile(path, res));
 	}
 
-	async getAvatar(userId){
+	async getByUserId(userId){
 		let path = this._getAvatarsPath(userId);
-		let avatar = await readFile(path);
+		let avatar = await utils.readFile(path);
 		avatar = Buffer.from(avatar).toString('base64');
 		return avatar;
 	}
 
+	deleteByUserId(userId){
+		let path = this._getAvatarsPath(userId);
+		return utils.unlink(path);
+	}
+
 	_getAvatarsPath(userId){
-		return __dirname+'/images/' + userId;
+		return `${__dirname}/images/${userId}`;
 	}
 }
 

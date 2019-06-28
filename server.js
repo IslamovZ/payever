@@ -1,31 +1,17 @@
-var express = require('express');
-var fs = require('fs');
+const express = require('express');
+const fs = require('fs');
+const usersController = require('./controllers/users');
+const app_port = require('./config').app_port;
 
-var usersController = require('./controllers/users');
-
-
-var app = express();
+const app = express();
 
 app.get('/api/user/:id', usersController.getById);
-
 app.get('/api/user/:id/avatar', usersController.getAvatar);
-
-app.delete('/api/user/:id/avatar', function(req, res){
-	const id = req.params.id;
-	var path = __dirname +'/images/'+ id;
-	fs.unlink(path, function(err) {
-	    if(err && err.code == 'ENOENT') {
-	        return res.status(200).send("File doesn't exist!");
-	    } else if (err) {
-	        logErr(err);
-			return res.status(400).send(err);
-	    } else {
-	        return res.status(200).send('File deleted');
-	    }
-	});
-});
+app.delete('/api/user/:id/avatar', usersController.deleteAvatar);
  
-app.listen(3000);
-
-
-
+app.listen(app_port, function(err) {
+  if (err) {
+    return console.error(err);
+  }
+  console.log(`🚀 app running at http://localhost:${app_port}`)
+});

@@ -21,7 +21,7 @@ exports.getById = async function (req, res) {
     return res.status(200).send(user);
   }catch(err){
     logErr(err);
-    res.sendStatus(500);
+    return res.sendStatus(500);
   }
 }
 
@@ -31,13 +31,27 @@ exports.getAvatar = async function(req, res){
     let checkExist = await Avatar.checkExist(userId);
     if(!checkExist){
       let user = await User.getById(userId);
-      await Avatar.downloadFromRest(userId, user.avatar);
+      await Avatar.downloadFromHost(userId, user.avatar);
     }
-    let avatar = await Avatar.getAvatar(userId);
+    let avatar = await Avatar.getByUserId(userId);
     return res.status(200).send(avatar);
   }catch(err){
     logErr(err);
-    res.sendStatus(500);
+    return res.sendStatus(500);
+  }
+}
+
+exports.deleteAvatar = async function(req, res){
+  try{
+    var userId = req.params.id;
+    await Avatar.deleteByUserId(userId);
+    return res.status(200).send('Avatar has been deleted!')
+  }catch(err){
+    if(err.code == 'ENOENT') {
+      return res.status(200).send("Avatar doesn't exist!");
+    }
+    logErr(err);
+    return res.sendStatus(500);
   }
 }
 
